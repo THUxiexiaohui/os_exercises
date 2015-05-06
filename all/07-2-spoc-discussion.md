@@ -51,3 +51,117 @@ s.count--;              //有可用资源，占用该资源；
 ## 小组思考题
 
 1. （spoc） 每人用python threading机制用信号量和条件变量两种手段分别实现[47个同步问题](07-2-spoc-pv-problems.md)中的一题。向勇老师的班级从前往后，陈渝老师的班级从后往前。请先理解[]python threading 机制的介绍和实例](https://github.com/chyyuu/ucore_lab/tree/master/related_info/lab7/semaphore_condition)
+第17题
+设公共汽车上，司机和售票员的活动分别如下：司机的活动：启动车辆：正常行车；到站停车。售票员的活动：关车门；售票；开车门。在汽车不断地到站、停车、行驶过程中，这两个活动有什么同步关系？用信号量和P 、V 操作实现它们的同步。
+
+> * 用信号量实现
+```
+#coding=utf-8
+import threading 
+import random
+import time
+
+class driverThread(threading.Thread):
+	def __init__(self,threadName,semaphore1,semaphore2):
+		threading.Thread.__init__(self,name=threadName)  
+		self.sleepTime=random.randrange(1,6)  
+		#set the semaphore as a data attribute of the class  
+		self.threadSemaphore1 = semaphore1
+		self.threadSemaphore2 = semaphore2
+	def run(self):
+		while True:
+			self.threadSemaphore1.acquire() 
+			print "Driver: bus start running"
+			time.sleep(self.sleepTime) 
+			print "Driver: bus is running"
+			time.sleep(self.sleepTime) 
+			print "Driver: bus stop"
+			self.threadSemaphore2.release()
+
+class conductorThread(threading.Thread):
+	def __init__(self,threadName,semaphore1,semaphore2):
+		threading.Thread.__init__(self,name=threadName)  
+		self.sleepTime=random.randrange(1,6)  
+		#set the semaphore as a data attribute of the class  
+		self.threadSemaphore1 = semaphore1
+		self.threadSemaphore2 = semaphore2
+	def run(self):
+		while True:
+			print "Conductor: close the bus door"
+			time.sleep(self.sleepTime) 
+			self.threadSemaphore1.release() 
+			print "Conductor: sale ticket"
+			time.sleep(self.sleepTime) 
+			self.threadSemaphore2.acquire()
+			time.sleep(self.sleepTime) 
+			print "Conductor: open the bus door"
+			time.sleep(self.sleepTime) 
+			print "Conductor: passenger on and off"
+threadSemaphore1=threading.Semaphore(0)    #是否允许司机启动汽车，初值为0
+threadSemaphore2=threading.Semaphore(0)    #是否允许售票员开门，初值为0 
+driver_thread = driverThread("driver",threadSemaphore1,threadSemaphore2)
+conductor_thread = conductorThread("conductor",threadSemaphore1,threadSemaphore2)
+driver_thread.start()
+conductor_thread.start()
+```
+
+> * 用条件变量实现
+```
+import threading
+import random
+import time
+
+condition = threading.Condition()
+busStatus = ""
+
+class Driver(threading.Thread):
+    def __init__(self,threadName):
+        threading.Thread.__init__(self,name=threadName)
+        self.sleepTime = random.randrange(1,6)
+
+    def run(self):
+        global condition, busStatus
+        while True:
+            if condition.acquire():
+                if busStatus == "Start":
+                    print "Driver: bus start running"
+                    busStatus = "Running"
+                    time.sleep(self.sleepTime)
+                    print "Driver: bus stop"
+                    busStatus = "Stop"
+                    time.sleep(self.sleepTime)
+                    condition.notify()
+                elif busStatus == "doorOpened":
+                    time.sleep(self.sleepTime)
+                    print "Driver: door not closed, waiting."
+                    condition.wait()
+                condition.release()
+
+class Conductor(threading.Thread):
+    def __init__(self,threadName):
+        threading.Thread.__init__(self,name=threadName)
+        self.sleepTime = random.randrange(1,6)
+
+    def run(self):
+        global condition, busStatus
+        while True:
+            if condition.acquire():
+                if busStatus == "Stop":
+                    print "Conductor: Bus stopped, open the door,passenger on and off"
+                    busStatus = "doorOpened"
+                    time.sleep(self.sleepTime)
+                    print "Conductor: close the door,sell tickets"
+                    busStatus = "Start"
+                    time.sleep(self.sleepTime)
+                    condition.notify()
+                elif busStatus == "Running":
+                    time.sleep(self.sleepTime)
+                    print "Condutor: bus not stopped, cannot open the door."
+                    condition.wait()
+                condition.release()
+
+if __name__ == '__main__':
+    busStatus = "Start"  
+    Driver("driver").start()
+    Conductor("conductor").start()
+```
