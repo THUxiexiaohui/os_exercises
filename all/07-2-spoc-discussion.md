@@ -50,6 +50,7 @@ s.count--;              //有可用资源，占用该资源；
  
 ## 小组思考题
 
+<<<<<<< HEAD
 1. （spoc） 每人用python threading机制用信号量和条件变量两种手段分别实现[47个同步问题](07-2-spoc-pv-problems.md)中的一题。向勇老师的班级从前往后，陈渝老师的班级从后往前。请先理解[]python threading 机制的介绍和实例](https://github.com/chyyuu/ucore_lab/tree/master/related_info/lab7/semaphore_condition)
  - 第17题
 设公共汽车上，司机和售票员的活动分别如下：司机的活动：启动车辆：正常行车；到站停车。售票员的活动：关车门；售票；开车门。在汽车不断地到站、停车、行驶过程中，这两个活动有什么同步关系？用信号量和P 、V 操作实现它们的同步。
@@ -157,3 +158,8 @@ if __name__ == '__main__':
     Driver("driver").start()
     Conductor("conductor").start()
 ```
+=======
+1. （spoc） 每人用python threading机制用信号量和条件变量两种手段分别实现[47个同步互斥问题](07-2-spoc-pv-problems.md)中的一题。向勇老师的班级从前往后，陈渝老师的班级从后往前。请先理解[]python threading 机制的介绍和实例](https://github.com/chyyuu/ucore_lab/tree/master/related_info/lab7/semaphore_condition)
+
+2. (spoc)设计某个方法，能够动态检查出对于两个或多个进程的同步互斥问题执行中，没有互斥问题，能够同步等，以说明实现的正确性。
+>>>>>>> c42e67792e804a57bfcbf5f509328e840eb70c29
