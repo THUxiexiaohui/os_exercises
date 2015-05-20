@@ -39,5 +39,23 @@
 
 ## 小组思考题
  - (spoc)完成磁盘访问与磁盘寻道算法的作业，具体帮助和要求信息请看[disksim指导信息](https://github.com/chyyuu/ucore_lab/blob/master/related_info/lab8/disksim-homework.md)和[disksim参考代码](https://github.com/chyyuu/ucore_lab/blob/master/related_info/lab8/disksim-homework.py)
+> 1.
+```
+195
+375
+375
+795
+1305
+```
 
+> 2.
+```
+915
+```
+
+> 3.
+```
+SATF: 915
+BSATF: 915
+```
 
